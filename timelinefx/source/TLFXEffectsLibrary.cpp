@@ -4,6 +4,9 @@
 #include "TLFXAnimImage.h"
 
 #include <cassert>
+#ifdef __unix__
+#include <string.h>
+#endif
 
 namespace TLFX
 {

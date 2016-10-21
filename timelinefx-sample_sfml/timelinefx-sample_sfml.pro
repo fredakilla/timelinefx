@@ -2,7 +2,7 @@
 # 3rdparty libraries path
 #--------------------------------------------------------------------
 
-SFML = C:\Dev\SFML-2.4.0
+win32: SFML = C:\Dev\SFML-2.4.0
 
 #--------------------------------------------------------------------
 # target
@@ -65,19 +65,19 @@ CONFIG(debug,debug|release) {
 #debug
 DEFINES +=  \
         #WIN32 \
-        _USE_MATH_DEFINES \
+        _USE_MATH_DEFINES
 } else {
 # release
 DEFINES +=  \
         #WIN32 \
-        _USE_MATH_DEFINES \
+        _USE_MATH_DEFINES
 }
 
 #--------------------------------------------------------------------
 # libraries includes
 #--------------------------------------------------------------------
 
-INCLUDEPATH += $${SFML}/include
+win32:INCLUDEPATH += $${SFML}/include
 INCLUDEPATH += ../timelinefx/source
 INCLUDEPATH += ../pugixml/include
 
@@ -105,6 +105,15 @@ win32:LIBS += -L$${SFML}/lib -lsfml-graphics-d
 win32:LIBS += -L$${SFML}/lib -lsfml-system-d
 win32:LIBS += -L$${SFML}/lib -lsfml-window-d
 win32:LIBS += -L$${SFML}/lib -lsfml-main-d
+
+# use libsfml-dev => sudo apt-get install libsfml-dev
+unix:!macx:LIBS += -lsfml-network
+unix:!macx:LIBS += -lsfml-audio
+unix:!macx:LIBS += -lsfml-graphics
+unix:!macx:LIBS += -lsfml-window
+unix:!macx:LIBS += -lsfml-system
+
+
 } else {
 # release
 win32:LIBS += -L$${SFML}/lib -lsfml-graphics
@@ -120,7 +129,9 @@ win32:LIBS += -L$${SFML}/lib -lsfml-main
 win32:LIBS +=   kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib \
                 ole32.lib oleaut32.lib uuid.lib imm32.lib winmm.lib wsock32.lib opengl32.lib glu32.lib version.lib
 
-unix:!macx: LIBS += -lXinerama -lXcursor -lXrandr -lXi -ldl -lXxf86vm  -lpthread -lGL -lGLU -lX11
+unix:!macx: LIBS +=  \
+    -lsndfile -lopenal -lX11 -lX11-xcb -lxcb -lxcb-randr -lxcb-icccm -lxcb-image -ludev -lpthread -lGLEW -lfreetype -ljpeg -lGL
+
 
 
 #--------------------------------------------------------------------
