@@ -120,6 +120,13 @@ win32:LIBS += -L$${SFML}/lib -lsfml-graphics
 win32:LIBS += -L$${SFML}/lib -lsfml-system
 win32:LIBS += -L$${SFML}/lib -lsfml-window
 win32:LIBS += -L$${SFML}/lib -lsfml-main
+
+unix:!macx:LIBS += -lsfml-network
+unix:!macx:LIBS += -lsfml-audio
+unix:!macx:LIBS += -lsfml-graphics
+unix:!macx:LIBS += -lsfml-window
+unix:!macx:LIBS += -lsfml-system
+
 }
 
 
