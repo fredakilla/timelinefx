@@ -115,6 +115,7 @@ unix:!macx:LIBS += -lsfml-system
 
 
 } else {
+
 # release
 win32:LIBS += -L$${SFML}/lib -lsfml-graphics
 win32:LIBS += -L$${SFML}/lib -lsfml-system
@@ -135,6 +136,8 @@ unix:!macx:LIBS += -lsfml-system
 
 win32:LIBS +=   kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib \
                 ole32.lib oleaut32.lib uuid.lib imm32.lib winmm.lib wsock32.lib opengl32.lib glu32.lib version.lib
+
+
 
 unix:!macx: LIBS +=  \
     -lsndfile -lopenal -lX11 -lX11-xcb -lxcb -lxcb-randr -lxcb-icccm -lxcb-image -ludev -lpthread -lGLEW -lfreetype -ljpeg -lGL

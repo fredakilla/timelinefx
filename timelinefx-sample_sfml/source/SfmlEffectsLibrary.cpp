@@ -12,41 +12,41 @@
 extern sf::RenderWindow* g_renderWindow;
 
 
-TLFX::XMLLoader* MarmaladeEffectsLibrary::CreateLoader() const
+TLFX::XMLLoader* SfmlEffectsLibrary::CreateLoader() const
 {
     return new TLFX::PugiXMLLoader(0);
 }
 
-TLFX::AnimImage* MarmaladeEffectsLibrary::CreateImage() const
+TLFX::AnimImage* SfmlEffectsLibrary::CreateImage() const
 {
-    return new MarmaladeImage();
+    return new SfmlImage();
 }
 
-bool MarmaladeImage::Load( const char *filename )
+bool SfmlImage::Load( const char *filename )
 {
     _texture = new sf::Texture();
     assert(_texture->loadFromFile(filename));
     return true;
 }
 
-MarmaladeImage::MarmaladeImage()
+SfmlImage::SfmlImage()
     : _texture(NULL)
 {
 
 }
 
-MarmaladeImage::~MarmaladeImage()
+SfmlImage::~SfmlImage()
 {
     if (_texture)
         delete _texture;
 }
 
-sf::Texture *MarmaladeImage::GetTexture() const
+sf::Texture *SfmlImage::GetTexture() const
 {
     return _texture;
 }
 
-MarmaladeParticleManager::MarmaladeParticleManager( int particles /*= particleLimit*/, int layers /*= 1*/ )
+SfmlParticleManager::SfmlParticleManager( int particles /*= particleLimit*/, int layers /*= 1*/ )
     : TLFX::ParticleManager(particles, layers)
     , _lastSprite(NULL)
     , _lastAdditive(true)
@@ -54,9 +54,9 @@ MarmaladeParticleManager::MarmaladeParticleManager( int particles /*= particleLi
 
 }
 
-void MarmaladeParticleManager::DrawSprite( TLFX::AnimImage* sprite, float px, float py, float frame, float x, float y, float rotation, float scaleX, float scaleY, unsigned char r, unsigned char g, unsigned char b, float a , bool additive )
+void SfmlParticleManager::DrawSprite( TLFX::AnimImage* sprite, float px, float py, float frame, float x, float y, float rotation, float scaleX, float scaleY, unsigned char r, unsigned char g, unsigned char b, float a , bool additive )
 {
-    assert(frame == 0);
+    //assert(frame == 0);
 
     unsigned char alpha = (unsigned char)(a * 255);
     if (alpha == 0 || scaleX == 0 || scaleY == 0) return;
@@ -80,7 +80,7 @@ void MarmaladeParticleManager::DrawSprite( TLFX::AnimImage* sprite, float px, fl
     _lastAdditive = additive;
 }
 
-void MarmaladeParticleManager::Flush()
+void SfmlParticleManager::Flush()
 {
     if (g_renderWindow && !_batch.empty() && _lastSprite)
     {
@@ -114,8 +114,9 @@ void MarmaladeParticleManager::Flush()
             float x3 = x2;
             float y3 = y0;
 
-            float cos = cosf(it->rotation / 180.f * (float)M_PI);
-            float sin = sinf(it->rotation / 180.f * (float)M_PI);
+            float angle = it->rotation / 180.f * (float)M_PI;
+            float cos = cosf(angle);
+            float sin = sinf(angle);
 
             quad[0].position.x = it->px + x0 * cos - y0 * sin;
             quad[0].position.y = it->py + x0 * sin + y0 * cos;
@@ -140,19 +141,18 @@ void MarmaladeParticleManager::Flush()
 
         }
 
-
-
         sf::RenderStates states;
-        states.texture = static_cast<MarmaladeImage*>(_lastSprite)->GetTexture();
-        states.blendMode = _lastAdditive ? sf::BlendAlpha : sf::BlendAdd;
+        states.texture = static_cast<SfmlImage*>(_lastSprite)->GetTexture();
+        states.blendMode = _lastAdditive ? sf::BlendAdd : sf::BlendAlpha;
 
         g_renderWindow->draw(m_vertices, states);
+
 
         /*glEnable(GL_BLEND);
         glDepthMask(GL_TRUE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
-        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);*/
+        //glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);*/
+        //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
         _batch.clear();
 

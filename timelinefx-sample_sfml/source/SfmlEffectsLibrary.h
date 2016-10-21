@@ -2,34 +2,32 @@
 #pragma once
 #endif
 
-
-#include <SFML/Graphics.hpp>
 /*
- * Marmalade IwGx for rendering
+ * SFML for rendering
  * PugiXML for parsing data
  */
 
-#ifndef _MARMALADEEFFECTSLIBRARY_H
-#define _MARMALADEEFFECTSLIBRARY_H
+#ifndef _SFMLEFFECTSLIBRARY_H
+#define _SFMLEFFECTSLIBRARY_H
 
 #include "TLFXEffectsLibrary.h"
 #include "TLFXParticleManager.h"
 #include "TLFXAnimImage.h"
-
+#include <SFML/Graphics.hpp>
 
 class XMLLoader;
 
-class MarmaladeEffectsLibrary : public TLFX::EffectsLibrary
+class SfmlEffectsLibrary : public TLFX::EffectsLibrary
 {
 public:
     virtual TLFX::XMLLoader* CreateLoader() const;
     virtual TLFX::AnimImage* CreateImage() const;
 };
 
-class MarmaladeParticleManager : public TLFX::ParticleManager
+class SfmlParticleManager : public TLFX::ParticleManager
 {
 public:
-    MarmaladeParticleManager(int particles = TLFX::ParticleManager::particleLimit, int layers = 1);
+    SfmlParticleManager(int particles = TLFX::ParticleManager::particleLimit, int layers = 1);
     void Flush();
 protected:
     virtual void DrawSprite(TLFX::AnimImage* sprite, float px, float py, float frame, float x, float y, float rotation,
@@ -50,11 +48,11 @@ protected:
     bool             _lastAdditive;
 };
 
-class MarmaladeImage : public TLFX::AnimImage
+class SfmlImage : public TLFX::AnimImage
 {
 public:
-    MarmaladeImage();
-    ~MarmaladeImage();
+    SfmlImage();
+    ~SfmlImage();
 
     bool Load(const char *filename);
     sf::Texture* GetTexture() const;
@@ -64,4 +62,4 @@ protected:
     sf::Texture *_texture;
 };
 
-#endif // _MARMALADEEFFECTSLIBRARY_H
+#endif // _SFMLEFFECTSLIBRARY_H
