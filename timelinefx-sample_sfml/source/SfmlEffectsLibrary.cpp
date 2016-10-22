@@ -25,7 +25,13 @@ TLFX::AnimImage* SfmlEffectsLibrary::CreateImage() const
 bool SfmlImage::Load( const char *filename )
 {
     _texture = new sf::Texture();
+
+    //std::string path = filename;
+    //std::string base_filename = path.substr(path.find_last_of("/\\") + 1);
+    //assert(_texture->loadFromFile("DebugTest/" + base_filename));
+
     assert(_texture->loadFromFile(filename));
+
     return true;
 }
 
@@ -84,8 +90,8 @@ void SfmlParticleManager::Flush()
 {
     if (g_renderWindow && !_batch.empty() && _lastSprite)
     {
-        int count = _batch.size();
-        int count4 = count * 4;
+        unsigned int count = (unsigned int)_batch.size();
+        unsigned int count4 = count * 4;
 
         sf::VertexArray m_vertices(sf::Quads, 4);
         m_vertices.resize(count4);
@@ -98,10 +104,7 @@ void SfmlParticleManager::Flush()
             // color
 
             for (int i=0; i<4; ++i)
-            {
-                quad[i].color = sf::Color(it->color.r, it->color.g, it->color.b, it->color.a);
-            }
-
+                quad[i].color = it->color;
 
             // pos
 
