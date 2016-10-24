@@ -7,21 +7,24 @@
 #include <SFML/Window.hpp>
 
 #include <iostream>
-#include  <sstream>
+#include <sstream>
 
 TLFX::EffectsLibrary *gEffects = NULL;
 SfmlParticleManager *gPM = NULL;
 TLFX::Effect* gCurrentEffect = NULL;
+sf::RenderWindow* g_renderWindow = NULL;
 
-static const unsigned WIDTH = 1024;
-static const unsigned HEIGHT = 768;
-sf::RenderWindow* g_renderWindow = 0;
-
+static const unsigned WIDTH = 1024;             // window width
+static const unsigned HEIGHT = 768;             // window height
+const char* g_effectDirectory = "particles";    // directory name where is located the effect data.xml
 
 void Init()
 {
+    std::string filename(g_effectDirectory);
+    filename.append("/data.xml");
+
     gEffects = new SfmlEffectsLibrary();
-    gEffects->Load("particles/data.xml");
+    gEffects->Load(filename.c_str());
 
     gPM = new SfmlParticleManager(10000, 1);
     gPM->SetScreenSize(WIDTH, HEIGHT);
@@ -36,11 +39,15 @@ void Init()
     //TLFX::Effect *eff = gEffects->GetEffect("Pyro/Complex Explosion 2");
     //TLFX::Effect *eff = gEffects->GetEffect("Spacey/Cosmic Alien Spiral");
     //TLFX::Effect *eff = gEffects->GetEffect("Spacey/Birth of a Red Giant");
-    TLFX::Effect *eff = gEffects->GetEffect("Sprays/Lava Spew");
+    //TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Scanlines");
     //TLFX::Effect *eff = gEffects->GetEffect("Pyro/Long Smoke trail");
+    //TLFX::Effect *eff = gEffects->GetEffect("Tests/Debug");
+    //TLFX::Effect *eff = gEffects->GetEffect("Elements/Hundredths");
+    //TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Waves 3");
+    //TLFX::Effect *eff = gEffects->GetEffect("Elements/LetterFalls");
+    TLFX::Effect *eff = gEffects->GetEffect("Sprays/Lava Spew");
 
     gCurrentEffect = new TLFX::Effect(*eff, gPM);
-
     gCurrentEffect->SetPosition(0.0f, 0.0f);
     gPM->AddEffect(gCurrentEffect);
 }

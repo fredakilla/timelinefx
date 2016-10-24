@@ -10,6 +10,7 @@
 
 
 extern sf::RenderWindow* g_renderWindow;
+extern const char* g_effectDirectory;
 
 
 TLFX::XMLLoader* SfmlEffectsLibrary::CreateLoader() const
@@ -26,11 +27,11 @@ bool SfmlImage::Load( const char *filename )
 {
     _texture = new sf::Texture();
 
-    //std::string path = filename;
-    //std::string base_filename = path.substr(path.find_last_of("/\\") + 1);
-    //assert(_texture->loadFromFile("DebugTest/" + base_filename));
-
-    assert(_texture->loadFromFile(filename));
+    // replace any existing path in filename by the effect directory
+    std::string path = filename;
+    std::string base_filename = path.substr(path.find_last_of("/\\") + 1);
+    std::string url = std::string(g_effectDirectory) + "/" + base_filename;
+    assert(_texture->loadFromFile(url.c_str()));
 
     return true;
 }
@@ -62,8 +63,6 @@ SfmlParticleManager::SfmlParticleManager( int particles /*= particleLimit*/, int
 
 void SfmlParticleManager::DrawSprite( TLFX::AnimImage* sprite, float px, float py, float frame, float x, float y, float rotation, float scaleX, float scaleY, unsigned char r, unsigned char g, unsigned char b, float a , bool additive )
 {
-    //assert(frame == 0);
-
     unsigned char alpha = (unsigned char)(a * 255);
     if (alpha == 0 || scaleX == 0 || scaleY == 0) return;
 
@@ -90,9 +89,14 @@ void SfmlParticleManager::Flush()
 {
     if (g_renderWindow && !_batch.empty() && _lastSprite)
     {
+        // get SFML texture of the _lastSprite
+        sf::Texture* texture = static_cast<SfmlImage*>(_lastSprite)->GetTexture();
+
+        // compute vertices size
         unsigned int count = (unsigned int)_batch.size();
         unsigned int count4 = count * 4;
 
+        // create vertex array
         sf::VertexArray m_vertices(sf::Quads, 4);
         m_vertices.resize(count4);
 
@@ -130,23 +134,40 @@ void SfmlParticleManager::Flush()
             quad[3].position.x = it->px + x3 * cos - y3 * sin;
             quad[3].position.y = it->py + x3 * sin + y3 * cos;
 
+            // uv
 
-            // uvs
+            sf::Vector2f offset(0.0f, 0.0f);
 
-            quad[0].texCoords.x = 0.0f;
-            quad[0].texCoords.y = 0.0f;
-            quad[1].texCoords.x = 0.0f;
-            quad[1].texCoords.y = 1.0f * _lastSprite->GetHeight();
-            quad[2].texCoords.x = 1.0f * _lastSprite->GetWidth();
-            quad[2].texCoords.y = 1.0f * _lastSprite->GetHeight();
-            quad[3].texCoords.x = 1.0f * _lastSprite->GetWidth();
-            quad[3].texCoords.y = 0.0f;
+            // compute offset for animated sprites
+            if(_lastSprite->GetFramesCount() > 1)
+            {
+                const int tiles_in_row = texture->getSize().x / (int)_lastSprite->GetWidth();
+                const int tiles_in_column = texture->getSize().y / (int)_lastSprite->GetHeight();
 
+                //const int tileNumber = (int)floor(it->frame);
+                //const int tile_x = (tileNumber % tiles_in_row);
+                //const int tile_y = (tileNumber / tiles_in_column);
+                const int tile_x = (int)fmod(it->frame, tiles_in_row);
+                const int tile_y = (int)(it->frame / tiles_in_column);
+
+                offset.x = tile_x * _lastSprite->GetWidth();
+                offset.y = tile_y * _lastSprite->GetHeight();
+            }
+
+            quad[0].texCoords.x = offset.x;
+            quad[0].texCoords.y = offset.y;
+            quad[1].texCoords.x = offset.x;
+            quad[1].texCoords.y = offset.y + _lastSprite->GetHeight();
+            quad[2].texCoords.x = offset.x + _lastSprite->GetWidth();
+            quad[2].texCoords.y = offset.y + _lastSprite->GetHeight();
+            quad[3].texCoords.x = offset.x + _lastSprite->GetWidth();
+            quad[3].texCoords.y = offset.y;
         }
 
         sf::RenderStates states;
-        states.texture = static_cast<SfmlImage*>(_lastSprite)->GetTexture();
+        states.texture = texture;
         states.blendMode = _lastAdditive ? sf::BlendAdd : sf::BlendAlpha;
+        //states.blendMode = sf::BlendNone;
 
         g_renderWindow->draw(m_vertices, states);
 
