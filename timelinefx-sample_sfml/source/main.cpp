@@ -9,6 +9,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "miniz.c"
+
 TLFX::EffectsLibrary *gEffects = NULL;
 SfmlParticleManager *gPM = NULL;
 TLFX::Effect* gCurrentEffect = NULL;
@@ -16,27 +18,20 @@ sf::RenderWindow* g_renderWindow = NULL;
 
 static const unsigned WIDTH = 1024;             // window width
 static const unsigned HEIGHT = 768;             // window height
-const char* g_effectDirectory = "FireandSmoke";    // directory name where is located the effect data.xml
+const char* effectFileName = "Readouts.eff";
 
-#include "miniz.c"
-typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef unsigned int uint;
-
-const char* effectFileName = "LibraryExamples.eff";
 
 int Unzip()
 {
-    int i, sort_iter;
+    int i;
     mz_bool status;
     size_t uncomp_size;
     mz_zip_archive zip_archive;
-    void *p;
-    //const int N = 50;
-    //char data[2048];
-    //char archive_filename[64];
-    //static const char *s_Test_archive_filename = "__mz_example2_test__.zip";
 
+    // create unzipped Directory (OS specific)
+    // Linux version
+    system("rm -r unzipped");
+    mkdir("unzipped", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
 
     memset(&zip_archive, 0, sizeof(zip_archive));
@@ -71,97 +66,40 @@ int Unzip()
         }
 
 
+        std::string destFilename(file_stat.m_filename);
 
+        // don't extract files in subdir
+        if (destFilename.find('/') != std::string::npos)
+            continue;
 
-        // Try to extract all the files to the heap.
-        p = mz_zip_reader_extract_file_to_heap(&zip_archive, file_stat.m_filename, &uncomp_size, 0);
-        if (!p)
+        // if DATA.XML is uppercase, lower it
+        if(destFilename.compare("DATA.XML") == 0)
+            std::transform(destFilename.begin(), destFilename.end(), destFilename.begin(), ::tolower);
+
+        destFilename.insert(0, "unzipped/");
+
+        mz_bool cr = mz_zip_reader_extract_file_to_file(&zip_archive, file_stat.m_filename, destFilename.c_str(), 0);
+        if(!cr)
         {
-            printf("mz_zip_reader_extract_file_to_heap() failed!\n");
+            printf("mz_zip_reader_extract_file_to_file() failed!\n");
             mz_zip_reader_end(&zip_archive);
             return EXIT_FAILURE;
         }
 
-        // Make sure the extraction really succeeded.
-        //if ((uncomp_size != (strlen(data) + 1)) || (memcmp(p, data, strlen(data))))
-        if (uncomp_size != file_stat.m_uncomp_size)
-        {
-            printf("mz_zip_reader_extract_file_to_heap() failed to extract the proper data\n");
-            mz_free(p);
-            mz_zip_reader_end(&zip_archive);
-            return EXIT_FAILURE;
-        }
-
-        printf("Successfully extracted file \"%s\", size %u\n", file_stat.m_filename, (uint)uncomp_size);
-        //printf("File data: \"%s\"\n", (const char *)p);
-
-
+        printf("Successfully extracted file \"%s\", size %u\n", destFilename.c_str(), (uint)uncomp_size);
     }
 
     // Close the archive, freeing any resources it was using
     mz_zip_reader_end(&zip_archive);
 
-
-
-    // Now verify the compressed data
-    /*for (sort_iter = 0; sort_iter < 2; sort_iter++)
-    {
-        memset(&zip_archive, 0, sizeof(zip_archive));
-        status = mz_zip_reader_init_file(&zip_archive, effectFileName, sort_iter ? MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY : 0);
-        if (!status)
-        {
-            printf("mz_zip_reader_init_file() failed!\n");
-            return EXIT_FAILURE;
-        }
-
-        for (i = 0; i < N; i++)
-        {
-            sprintf(archive_filename, "%u.txt", i);
-            //sprintf(data, "%u %s %u", (N - 1) - i, s_pTest_str, i);
-
-            // Try to extract all the files to the heap.
-            p = mz_zip_reader_extract_file_to_heap(&zip_archive, archive_filename, &uncomp_size, 0);
-            if (!p)
-            {
-                printf("mz_zip_reader_extract_file_to_heap() failed!\n");
-                mz_zip_reader_end(&zip_archive);
-                return EXIT_FAILURE;
-            }
-
-            // Make sure the extraction really succeeded.
-            if ((uncomp_size != (strlen(data) + 1)) || (memcmp(p, data, strlen(data))))
-            {
-                printf("mz_zip_reader_extract_file_to_heap() failed to extract the proper data\n");
-                mz_free(p);
-                mz_zip_reader_end(&zip_archive);
-                return EXIT_FAILURE;
-            }
-
-            printf("Successfully extracted file \"%s\", size %u\n", archive_filename, (uint)uncomp_size);
-            printf("File data: \"%s\"\n", (const char *)p);
-
-            // We're done.
-            mz_free(p);
-        }
-
-        // Close the archive, freeing any resources it was using
-        mz_zip_reader_end(&zip_archive);
-    }*/
-
     printf("Success.\n");
-
-
-
     return EXIT_SUCCESS;
 }
 
 void Init()
 {
-    std::string filename(g_effectDirectory);
-    filename.append("/data.xml");
-
     gEffects = new SfmlEffectsLibrary();
-    gEffects->Load(filename.c_str());
+    gEffects->Load("unzipped/data.xml");
 
     gPM = new SfmlParticleManager(10000, 1);
     gPM->SetScreenSize(WIDTH, HEIGHT);
@@ -178,9 +116,9 @@ void Init()
     //TLFX::Effect *eff = gEffects->GetEffect("Spacey/Birth of a Red Giant");
     //TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Scanlines");
     //TLFX::Effect *eff = gEffects->GetEffect("Pyro/Long Smoke trail");
-    TLFX::Effect *eff = gEffects->GetEffect("Tests/Muzzle2");
+    //TLFX::Effect *eff = gEffects->GetEffect("Tests/Debug");
     //TLFX::Effect *eff = gEffects->GetEffect("Elements/Hundredths");
-    //TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Waves 3");
+    TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Waves 3");
     //TLFX::Effect *eff = gEffects->GetEffect("Elements/LetterFalls");
     //TLFX::Effect *eff = gEffects->GetEffect("Sprays/Lava Spew");
 

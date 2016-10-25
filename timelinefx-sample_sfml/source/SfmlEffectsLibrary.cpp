@@ -8,9 +8,7 @@
 #include <cmath>
 #include <assert.h>
 
-
 extern sf::RenderWindow* g_renderWindow;
-extern const char* g_effectDirectory;
 
 
 TLFX::XMLLoader* SfmlEffectsLibrary::CreateLoader() const
@@ -30,7 +28,8 @@ bool SfmlImage::Load( const char *filename )
     // replace any existing path in filename by the effect directory
     std::string path = filename;
     std::string base_filename = path.substr(path.find_last_of("/\\") + 1);
-    std::string url = std::string(g_effectDirectory) + "/" + base_filename;
+    //std::string url = std::string(g_effectDirectory) + "/" + base_filename;
+    std::string url = std::string("unzipped/" + base_filename);
     assert(_texture->loadFromFile(url.c_str()));
 
     return true;
