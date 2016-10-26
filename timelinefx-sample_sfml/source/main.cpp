@@ -18,7 +18,7 @@ sf::RenderWindow* g_renderWindow = NULL;
 
 static const unsigned WIDTH = 1024;             // window width
 static const unsigned HEIGHT = 768;             // window height
-const char* effectFileName = "Readouts.eff";
+const char* effectFileName = "LibraryExamples.eff";
 
 
 int Unzip()
@@ -29,9 +29,14 @@ int Unzip()
     mz_zip_archive zip_archive;
 
     // create unzipped Directory (OS specific)
+#ifdef  __linux__
     // Linux version
     system("rm -r unzipped");
     mkdir("unzipped", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#elif WIN32
+    RemoveDirectory(L"unzipped");
+    CreateDirectory(L"unzipped", 0);
+#endif
 
 
     memset(&zip_archive, 0, sizeof(zip_archive));
@@ -51,8 +56,8 @@ int Unzip()
         printf("Filename: \"%s\", Comment: \"%s\", Uncompressed size: %u, Compressed size: %u, Is Dir: %u\n",
                file_stat.m_filename,
                file_stat.m_comment,
-               (uint)file_stat.m_uncomp_size,
-               (uint)file_stat.m_comp_size,
+               (unsigned int)file_stat.m_uncomp_size,
+               (unsigned int)file_stat.m_comp_size,
                mz_zip_reader_is_file_a_directory(&zip_archive, i));
 
         if (!strcmp(file_stat.m_filename, "directory/"))
@@ -86,7 +91,7 @@ int Unzip()
             return EXIT_FAILURE;
         }
 
-        printf("Successfully extracted file \"%s\", size %u\n", destFilename.c_str(), (uint)uncomp_size);
+        printf("Successfully extracted file \"%s\", size %u\n", destFilename.c_str(), (unsigned int)uncomp_size);
     }
 
     // Close the archive, freeing any resources it was using
@@ -105,7 +110,7 @@ void Init()
     gPM->SetScreenSize(WIDTH, HEIGHT);
     gPM->SetOrigin(0, 0);
 
-    //TLFX::Effect *eff = gEffects->GetEffect("Sub Effects/Space Creature");
+   // /LFX::Effect *eff = gEffects->GetEffect("Sub Effects/Space Creature");
     //TLFX::Effect *eff = gEffects->GetEffect("Spacey/Plasma Flare");
     //TLFX::Effect *eff = gEffects->GetEffect("Area Effects/Area Test");
     //TLFX::Effect *eff = gEffects->GetEffect("Area Effects/Gas Hob");
@@ -115,12 +120,14 @@ void Init()
     //TLFX::Effect *eff = gEffects->GetEffect("Spacey/Cosmic Alien Spiral");
     //TLFX::Effect *eff = gEffects->GetEffect("Spacey/Birth of a Red Giant");
     //TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Scanlines");
-    //TLFX::Effect *eff = gEffects->GetEffect("Pyro/Long Smoke trail");
+    //TLFX::Effect *eff = gEffects->GetEffect("Power Ups/Power Source");
     //TLFX::Effect *eff = gEffects->GetEffect("Tests/Debug");
     //TLFX::Effect *eff = gEffects->GetEffect("Elements/Hundredths");
-    TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Waves 3");
+    //TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Waves 3");
     //TLFX::Effect *eff = gEffects->GetEffect("Elements/LetterFalls");
     //TLFX::Effect *eff = gEffects->GetEffect("Sprays/Lava Spew");
+    //TLFX::Effect *eff = gEffects->GetEffect("Tests/Debug");
+    TLFX::Effect *eff = gEffects->GetEffect("Machine Gun");
 
     gCurrentEffect = new TLFX::Effect(*eff, gPM);
     gCurrentEffect->SetPosition(0.0f, 0.0f);
