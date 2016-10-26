@@ -32,6 +32,8 @@ bool SfmlImage::Load( const char *filename )
     std::string url = std::string("unzipped/" + base_filename);
     assert(_texture->loadFromFile(url.c_str()));
 
+    _texture->setSmooth(true);
+
     return true;
 }
 
