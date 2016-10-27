@@ -121,13 +121,12 @@ void Init()
     //TLFX::Effect *eff = gEffects->GetEffect("Spacey/Birth of a Red Giant");
     //TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Scanlines");
     //TLFX::Effect *eff = gEffects->GetEffect("Power Ups/Power Source");
-    //TLFX::Effect *eff = gEffects->GetEffect("Tests/Debug");
     //TLFX::Effect *eff = gEffects->GetEffect("Elements/Hundredths");
     //TLFX::Effect *eff = gEffects->GetEffect("Readouts/Monitor Readout Waves 3");
     //TLFX::Effect *eff = gEffects->GetEffect("Elements/LetterFalls");
     //TLFX::Effect *eff = gEffects->GetEffect("Sprays/Lava Spew");
-    //TLFX::Effect *eff = gEffects->GetEffect("Tests/Debug");
-    TLFX::Effect *eff = gEffects->GetEffect("Machine Gun");
+    //TLFX::Effect *eff = gEffects->GetEffect("Machine Gun");
+    TLFX::Effect *eff = gEffects->GetEffect("Super Effect");
 
     gCurrentEffect = new TLFX::Effect(*eff, gPM);
     gCurrentEffect->SetPosition(0.0f, 0.0f);
@@ -215,7 +214,9 @@ int main()
                 {
                     float mouseX = sf::Mouse::getPosition(window).x - (WIDTH/2.0f);
                     float mouseY = sf::Mouse::getPosition(window).y - (HEIGHT/2.0f);
-                    gCurrentEffect->SetPosition(mouseX, mouseY);
+                    //gCurrentEffect->SetPosition(mouseX, mouseY);
+                    gCurrentEffect->SetX(mouseX);
+                    gCurrentEffect->SetY(mouseY);
                 }
             }
         }
